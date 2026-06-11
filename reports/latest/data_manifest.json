@@ -1,0 +1,38 @@
+[
+  {
+    "path": "data/SPY_2015_2023.csv",
+    "rows": 2264,
+    "sha256": "769010dd0f4271126cb86fccf5139323be31149fad04959222325947619e7215",
+    "symbol": "SPY"
+  },
+  {
+    "path": "data/AAPL_2015_2023.csv",
+    "rows": 2264,
+    "sha256": "b9c5c5b067bfcf2b38f6fbcad3efa637620983a6cee1c885bf6fc1ebba845c6d",
+    "symbol": "AAPL"
+  },
+  {
+    "path": "data/MSFT_2015_2023.csv",
+    "rows": 2264,
+    "sha256": "864d7e4b28d1c0d9a0db25e26cd9fb21603e86ac6cbf4d5350fda09e5f21a5d8",
+    "symbol": "MSFT"
+  },
+  {
+    "path": "data/JPM_2015_2023.csv",
+    "rows": 2264,
+    "sha256": "3a5ff926daeaffab84dd669cd6d456574b2ee4a04d5f8c0b4ec1e9190e9e7db7",
+    "symbol": "JPM"
+  },
+  {
+    "path": "data/XOM_2015_2023.csv",
+    "rows": 2264,
+    "sha256": "b8c8f37153fc8a65bfc524ec73ada16e3e64415325a447692fa0e28c411a3bde",
+    "symbol": "XOM"
+  },
+  {
+    "path": "data/JNJ_2015_2023.csv",
+    "rows": 2264,
+    "sha256": "59a168fde3ccb9715bc687f3d9836bf3c7c593c06643e3f2a07733577b695397",
+    "symbol": "JNJ"
+  }
+]

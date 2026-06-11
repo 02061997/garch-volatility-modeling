@@ -1,0 +1,27 @@
+[project]
+name = "garch-volatility-modeling"
+version = "1.0.0"
+description = "Walk-forward volatility forecasting with GARCH diagnostics and baseline tests."
+requires-python = ">=3.11"
+dependencies = [
+  "matplotlib>=3.9",
+  "numpy>=2.0",
+  "pandas>=2.2",
+  "pyarrow>=17",
+  "scikit-learn>=1.5",
+  "scipy>=1.14",
+  "statsmodels>=0.14",
+  "yfinance>=0.2.54",
+  "arch>=7.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "ruff>=0.9"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
