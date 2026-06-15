@@ -1,4 +1,4 @@
 {
-  "refit_step_days": 21,
+  "refit_every_days": 21,
   "window": 500
 }

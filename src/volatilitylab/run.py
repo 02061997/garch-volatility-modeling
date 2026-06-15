@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -9,10 +10,22 @@ import pandas as pd
 import yfinance as yf
 
 from .artifacts import environment, run_dir, save_json, sha256
-from .core import diagnostics, evaluate, forecasts
+from .core import diebold_mariano, diagnostics, evaluate, forecasts, interval_summary, regime_metrics
 
 
 SYMBOLS = ["SPY", "AAPL", "MSFT", "JPM", "XOM", "JNJ"]
+
+
+def publish_latest(out: Path) -> None:
+    latest = Path("reports/latest")
+    latest.mkdir(parents=True, exist_ok=True)
+    for existing in latest.iterdir():
+        if existing.is_file():
+            existing.unlink()
+    for source in out.iterdir():
+        if source.is_file():
+            shutil.copy2(source, latest / source.name)
+    Path("reports/SOURCE_RUN.txt").write_text(f"{out}\n")
 
 
 def synthetic(n=900):
@@ -55,9 +68,23 @@ def main():
     symbols = ["SYNTH"] if args.smoke else SYMBOLS
     for symbol in symbols:
         series, manifest = (synthetic(), {"source": "synthetic"}) if args.smoke else load(symbol)
-        frame = forecasts(series, window=400 if args.smoke else 500, step=20 if args.smoke else 21)
+        window = 400 if args.smoke else 500
+        refit_every = 20 if args.smoke else 21
+        frame = forecasts(series, window=window, refit_every=refit_every)
         metrics[symbol] = evaluate(frame)
-        tests[symbol] = diagnostics(series)
+        metrics[symbol]["intervals"] = interval_summary(frame)
+        tests[symbol] = {
+            "diagnostics": diagnostics(series),
+            "die_bold_mariano_garch_vs_rolling": diebold_mariano(
+                frame["actual_variance"], frame["garch"], frame["rolling"]
+            ),
+            "die_bold_mariano_garch_vs_ewma": diebold_mariano(
+                frame["actual_variance"], frame["garch"], frame["ewma"]
+            ),
+            "regime_metrics": regime_metrics(frame),
+            "refit_count": int(frame.refit.sum()),
+            "forecast_rows": int(len(frame)),
+        }
         manifests.append({"symbol": symbol, **manifest})
         all_predictions.append(frame.assign(symbol=symbol).reset_index())
     pred = pd.concat(all_predictions)
@@ -73,12 +100,25 @@ def main():
     fig.tight_layout()
     fig.savefig(out / "volatility_forecast.png", dpi=180)
     plt.close(fig)
-    save_json(out / "config.yaml", {"window": 500, "refit_step_days": 21})
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+    for symbol, group in pred.groupby("symbol"):
+        ax.plot(group.date, group.alpha_plus_beta, label=symbol, alpha=0.8)
+    ax.axhline(1.0, color="black", linestyle="--", linewidth=1)
+    ax.set_ylabel("GARCH alpha + beta")
+    ax.legend(ncol=2)
+    fig.tight_layout()
+    fig.savefig(out / "parameter_stability.png", dpi=180)
+    plt.close(fig)
+
+    save_json(out / "config.yaml", {"window": 500, "refit_every_days": 21})
     save_json(out / "environment.json", environment())
     save_json(out / "data_manifest.json", manifests)
     save_json(out / "metrics.json", metrics)
     save_json(out / "statistical_tests.json", tests)
     (out / "run.log").write_text("completed\n")
+    if not args.smoke:
+        publish_latest(out)
     print(out)
 
 
