@@ -4,6 +4,19 @@ Walk-forward comparison of GARCH(1,1), EWMA, and rolling-variance forecasts
 with residual diagnostics and QLIKE evaluation. Full results use frozen
 2015–2023 market-data snapshots for SPY and five equities.
 
+## Best Evidence
+
+- **What I built:** a leakage-controlled volatility forecasting benchmark for
+  GARCH(1,1), EWMA, and rolling-variance baselines.
+- **What is reproduced:** daily one-step forecasts, refit cadence tracking,
+  parameter stability, residual diagnostics, regime slices, and
+  Diebold-Mariano comparisons.
+- **What data is used:** frozen Yahoo Finance adjusted-close snapshots for SPY,
+  AAPL, MSFT, JPM, XOM, and JNJ.
+- **Main verified result:** GARCH wins RMSE on 4/6 symbols and QLIKE on 5/6;
+  EWMA remains best for JNJ/XOM RMSE and XOM QLIKE.
+- **How to verify:** `uv sync --frozen && make test && make reproduce-smoke`.
+
 ## What is implemented
 
 - Daily one-step-ahead volatility forecasts with no future returns in the
